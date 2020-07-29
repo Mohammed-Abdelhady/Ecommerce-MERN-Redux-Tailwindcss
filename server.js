@@ -9,10 +9,9 @@ app.use(bodyParser.json());
 require('dotenv').config({
   path: './config/index.env',
 });
-// MongoDB 
+// MongoDB
 const connectDB = require('./config/db');
-connectDB()
-
+connectDB();
 
 app.use(morgan('dev'));
 app.use(cors());
@@ -36,3 +35,4 @@ app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}!`);
 });
 
+// Thanks for watching
