@@ -1,0 +1,52 @@
+:root {
+    --menu-width: 28px;
+    --menu-height: 27px;
+    --bar-height: 4px;
+    --timing-animation: 0.3s;
+}
+
+
+.menu-icon {
+    width: var(--menu-width);
+    height: var(--menu-height);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+
+.menu-icon__bar {
+    position: absolute;
+    background-color: #6F64F8;
+    height: var(--bar-height);
+    width: var(--menu-width);
+    transition: opacity 0s var(--timing-animation), top var(--timing-animation) var(--timing-animation), bottom var(--timing-animation) var(--timing-animation), transform var(--timing-animation);
+
+}
+
+.menu-icon__bar:nth-child(1) {
+    top: 0;
+}
+
+.menu-icon__bar:nth-child(3) {
+    bottom: 0;
+}
+
+.menu-icon--isActive .menu-icon__bar {
+    transition: opacity 0s var(--timing-animation), top var(--timing-animation), bottom var(--timing-animation), transform var(--timing-animation) var(--timing-animation);
+
+}
+
+.menu-icon--isActive .menu-icon__bar:nth-child(1) {
+    transform: rotate(45deg);
+    top: calc(50% - calc(var(--bar-height)/ 2));
+}
+
+.menu-icon--isActive .menu-icon__bar:nth-child(3) {
+    transform: rotate(-45deg);
+    bottom: calc(50% - calc(var(--bar-height)/ 2));
+}
+
+.menu-icon--isActive .menu-icon__bar:nth-child(2) {
+    opacity: 0;
+}   
