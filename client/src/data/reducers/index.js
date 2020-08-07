@@ -1,4 +1,6 @@
 // root reducer for combine all reducers in app
 import { combineReducers } from 'redux'
-
-export default combineReducers({});
+import auth from './auth'
+export default combineReducers({
+    auth
+});
