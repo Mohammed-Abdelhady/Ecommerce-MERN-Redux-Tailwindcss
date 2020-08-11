@@ -2,8 +2,10 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import Button from '../buttons/button.component';
 import NavItem from './navbar.item';
+import { connect } from 'react-redux';
+import { logout } from '../../data/reducers/auth';
 
-const NavbarList = ({ history }) => {
+const NavbarList = ({ history, logout, isAuth }) => {
   // make active nav item with text primary
   const isActive = (history, path) => {
     if (history.location.pathname === path) {
@@ -25,13 +27,31 @@ const NavbarList = ({ history }) => {
         name='Dashboard'
         listStyle={isActive(history, '/dashboard')}
       />
-      <Button
-        title='Signout'
-        moreStyle='hover:text-primary'
-        action={() => {
-          console.log('signout');
-        }}
-      />
+      {isAuth && (
+        <Button
+          title='Signout'
+          moreStyle='hover:text-primary'
+          action={ () => {
+            logout();
+          }}
+        />
+      )}
+      {!isAuth && (
+        <>
+          <Button
+            title='Login'
+            moreStyle='hover:text-primary'
+            isButton={false}
+            href='/login'
+          />
+          <Button
+            title='Register'
+            moreStyle='hover:text-primary'
+            isButton={false}
+            href='/register'
+          />
+        </>
+      )}
       <Button
         isButton={false}
         href='/cart'
@@ -42,4 +62,7 @@ const NavbarList = ({ history }) => {
   );
 };
 
-export default withRouter(NavbarList);
+const mapStateToProps = (state) => ({
+  isAuth: state.auth.isAuthenticated,
+});
+export default connect(mapStateToProps, { logout })(withRouter(NavbarList));

@@ -12,7 +12,8 @@ const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
 const REGISTER_FAIL = 'REGISTER_FAIL';
 const USER_LOADED = 'USER_LOADED'
 const AUTH_ERROR = 'AUTH_ERROR'
-
+const LOGOUT = 'LOGOUT'
+const SET_LOADING = 'SET_LOADING'
 // Intial State
 const intialState = {
     token: localStorage.getItem('token'),
@@ -45,18 +46,24 @@ export default function (state = intialState, action) {
                     isAuthenticated: true,
                         loading: false,
                 };
-            case REGISTER_FAIL:
-            case AUTH_ERROR:
-                // Remove Token in localstorage
-                localStorage.removeItem('token');
+            case SET_LOADING:
                 return {
                     ...state,
-                    token: null,
-                        isAuthenticated: false,
-                        loading: false,
-                };
-            default:
-                return state;
+                    loading: true
+                }
+                case REGISTER_FAIL:
+                case AUTH_ERROR:
+                case LOGOUT:
+                    // Remove Token in localstorage
+                    localStorage.removeItem('token');
+                    return {
+                        ...state,
+                        token: null,
+                            isAuthenticated: false,
+                            loading: false,
+                    };
+                default:
+                    return state;
     }
 }
 
@@ -98,6 +105,9 @@ export const register = ({
         password
     });
 
+    dispatch({
+        type: SET_LOADING
+    })
     try {
         // Response 
         const res = await axios.post(`${URLDevelopment}/api/user/register`, body, config)
@@ -106,6 +116,7 @@ export const register = ({
             type: REGISTER_SUCCESS,
             payload: res.data
         })
+
     } catch (err) {
         const errors = err.response.data.errors
         if (errors) {
@@ -117,3 +128,10 @@ export const register = ({
         })
     }
 };
+
+
+export const logout = () => dispatch => {
+    dispatch({
+        type: LOGOUT
+    })
+}
