@@ -33,8 +33,8 @@ export default function (state = intialState, action) {
         case USER_LOADED:
             return {
                 ...state,
-                payload,
-                isAuthenticated: true,
+                user: payload,
+                    isAuthenticated: true,
                     loading: false
             }
             case REGISTER_SUCCESS:
@@ -61,6 +61,7 @@ export default function (state = intialState, action) {
                         token: null,
                             isAuthenticated: false,
                             loading: false,
+                            user: null
                     };
                 default:
                     return state;
@@ -116,7 +117,7 @@ export const register = ({
             type: REGISTER_SUCCESS,
             payload: res.data
         })
-
+        dispatch(loadUser())
     } catch (err) {
         const errors = err.response.data.errors
         if (errors) {

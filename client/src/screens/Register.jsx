@@ -6,6 +6,7 @@ import Container from '../components/container/container.component';
 import FormInput from '../components/inputs/form.input.component';
 import { register } from '../data/reducers/auth';
 import './loading.css';
+import { Redirect } from 'react-router-dom';
 
 const Register = ({ register, isAuth, isLoading, user }) => {
   const [data, setData] = useState({
@@ -30,6 +31,15 @@ const Register = ({ register, isAuth, isLoading, user }) => {
       register({ name, email, password });
     }
   };
+
+  console.log(isAuth, user)
+  if (isAuth && user) {
+    const { name, role } = user
+    toast.success(`welcome ${name}`)
+    if(role === 0) return <Redirect to='/dashboard/user'/>
+    if(role === 1) return <Redirect to='/dashboard/admin'/>
+  }
+
   return (
     <Container>
       <form
