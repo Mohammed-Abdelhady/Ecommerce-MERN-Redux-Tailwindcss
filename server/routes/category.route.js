@@ -3,7 +3,7 @@ const router = express.Router()
 const Category = require('../models/Category')
 const auth = require('../middleware/auth')
 const adminAuth = require('../middleware/adminAuth')
-
+const categoryById = require('../middleware/categoryById')
 const {
     check,
     validationResult
@@ -57,6 +57,48 @@ router.get('/all', async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')
+    }
+})
+
+// @route   Get api/category/:categoryId
+// @desc    Get Single category
+// @access  Public
+router.get('/:categoryId', categoryById, async (req, res) => {
+    res.json(req.category)
+})
+
+// @route   Put api/category/:categoryId
+// @desc    Update Single category
+// @access  Private Admin
+router.put('/:categoryId', auth, adminAuth, categoryById, async (req, res) => {
+    let category = req.category;
+    const {
+        name
+    } = req.body
+    if (name) category.name = name.trim()
+
+    try {
+        category = await category.save()
+        res.json(category)
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).send('Server error');
+    }
+})
+
+// @route   Delete api/category/:categoryId
+// @desc    Delete Single category
+// @access  Private Admin
+router.delete('/:categoryId', auth, adminAuth, categoryById, async (req, res) => {
+    let category = req.category;
+    try {
+        let deletedCategory = await category.remove()
+        res.json({
+            message: `${deletedCategory.name} deleted successfully`
+        })
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).send('Server error');
     }
 })
 module.exports = router
