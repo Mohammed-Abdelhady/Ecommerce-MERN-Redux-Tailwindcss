@@ -7,6 +7,9 @@ const formidable = require('formidable');
 const fs = require('fs');
 const productById = require('../middleware/productById');
 const _ = require('lodash');
+const {
+    send
+} = require('process');
 
 
 
@@ -36,6 +39,7 @@ router.get('/list', async (req, res) => {
     }
 });
 
+
 // @route   Get api/product/:productId
 // @desc    Get a list related to  product 
 // @access  Public
@@ -64,6 +68,26 @@ router.get('/related/:productId', productById, async (req, res) => {
         res.status(500).send('Invalid querys');
     }
 
+})
+
+
+// @route   Get api/product/categories
+// @desc    Get a list categories of products
+// @access  Public
+router.get('/categories', async (req, res) => {
+    try {
+        let categories = await Product.distinct('category')
+        if (!categories) {
+            return res.status(400).json({
+                error: 'Categories not found'
+            });
+        }
+        res.json(categories);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server Error')
+    }
 })
 
 // @route   Post api/product/
