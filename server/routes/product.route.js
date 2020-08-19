@@ -27,11 +27,7 @@ router.get('/list', async (req, res) => {
                 [sortBy, order]
             ])
             .limit(limit).exec();
-        if (!products) {
-            return res.status(400).json({
-                error: 'Products not found',
-            });
-        }
+
 
         res.json(products);
     } catch (error) {
@@ -39,6 +35,36 @@ router.get('/list', async (req, res) => {
         res.status(500).send('Invalid querys');
     }
 });
+
+// @route   Get api/product/:productId
+// @desc    Get a list related to  product 
+// @access  Public
+router.get('/related/:productId', productById, async (req, res) => {
+    let limit = req.query.limit ? parseInt(req.query.limit) : 6;
+    let sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt';
+    let order = req.query.order ? req.query.order : 'desc';
+
+    try {
+        let products = await Product.find({
+                _id: {
+                    $ne: req.product
+                },
+                category: req.product.category
+            }).select('-photo')
+            .limit(limit)
+            .sort([
+                [sortBy, order]
+            ])
+            .populate('category', '_id name')
+
+        res.json(products);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Invalid querys');
+    }
+
+})
 
 // @route   Post api/product/
 // @desc    Create a Product
