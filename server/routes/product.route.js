@@ -38,7 +38,66 @@ router.get('/list', async (req, res) => {
         res.status(500).send('Invalid querys');
     }
 });
+// @route   Get api/product/categories
+// @desc    Get a list categories of products
+// @access  Public
+router.get('/categories', async (req, res) => {
+    try {
+        let categories = await Product.distinct('category')
+        if (!categories) {
+            return res.status(400).json({
+                error: 'Categories not found'
+            });
+        }
+        res.json(categories);
 
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server Error')
+    }
+})
+
+// @route   Post api/product/filter
+// @desc    Create a Product
+// @access  Private Admin
+router.post('/filter', async (req, res) => {
+    let order = req.body.order ? req.body.order : 'desc';
+    let sortBy = req.body.sortBy ? req.body.sortBy : '_id';
+    let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+    let skip = parseInt(req.body.skip);
+    let findArgs = {};
+
+    for (let key in req.body.filters) {
+        if (req.body.filters[key].length > 0) {
+            if (key === 'price') {
+                // gte -  greater than price [0-10]
+                // lte - less than
+                findArgs[key] = {
+                    $gte: req.body.filters[key][0],
+                    $lte: req.body.filters[key][1]
+                };
+            } else {
+                findArgs[key] = req.body.filters[key];
+            }
+        }
+    }
+
+    try {
+        let products = await Product.find(findArgs)
+            .select('-photo')
+            .populate('category')
+            .sort([
+                [sortBy, order]
+            ])
+            .skip(skip)
+            .limit(limit);
+        res.json(products);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Products not found');
+    }
+
+})
 
 // @route   Get api/product/:productId
 // @desc    Get a list related to  product 
@@ -71,24 +130,6 @@ router.get('/related/:productId', productById, async (req, res) => {
 })
 
 
-// @route   Get api/product/categories
-// @desc    Get a list categories of products
-// @access  Public
-router.get('/categories', async (req, res) => {
-    try {
-        let categories = await Product.distinct('category')
-        if (!categories) {
-            return res.status(400).json({
-                error: 'Categories not found'
-            });
-        }
-        res.json(categories);
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).send('Server Error')
-    }
-})
 
 // @route   Post api/product/
 // @desc    Create a Product
@@ -239,5 +280,7 @@ router.put('/:productId', auth, adminAuth, productById, (req, res) => {
 });
 
 
+
+router.param("productId", productById);
 
 module.exports = router;
