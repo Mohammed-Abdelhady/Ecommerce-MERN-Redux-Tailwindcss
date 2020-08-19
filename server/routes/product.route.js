@@ -6,6 +6,7 @@ const adminAuth = require('../middleware/adminAuth')
 const formidable = require('formidable')
 const fs = require('fs');
 const productById = require('../middleware/productById');
+const { send } = require('process');
 
 
 // @route   Post api/product/
@@ -91,4 +92,23 @@ router.get("/photo/:productId", productById, (req, res) => {
         error: 'failed to load image'
     })
 })
+
+// @route   Delete api/product/
+// @desc    Delete a Product
+// @access  Private Admin
+router.delete("/:productId", productById, async (req, res) => {
+    let product = req.product
+    try {
+        let deletedProduct = await product.reomve()
+        res.json({
+            message: `${deletedProduct.name} deleted successfully`
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+
+})
+
+
 module.exports = router
