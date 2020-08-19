@@ -58,8 +58,8 @@ router.get('/categories', async (req, res) => {
 })
 
 // @route   Post api/product/filter
-// @desc    Create a Product
-// @access  Private Admin
+// @desc    filter a Product by price and category
+// @access  Public
 router.post('/filter', async (req, res) => {
     let order = req.body.order ? req.body.order : 'desc';
     let sortBy = req.body.sortBy ? req.body.sortBy : '_id';
@@ -99,6 +99,33 @@ router.post('/filter', async (req, res) => {
 
 })
 
+// @route   Get api/product/search
+// @desc    Get a list products by search quey 
+// @access  Public
+router.get("/search", async (req, res) => {
+    // create query object to hold search value and category value
+    const query = {};
+    // assign search value to query.name
+    if (req.query.search) {
+        query.name = {
+            $regex: req.query.search,
+            $options: 'i'
+        };
+        // assigne category value to query.category
+        if (req.query.category && req.query.category != 'All') {
+            query.category = req.query.category;
+        }
+    }
+    try {
+        let products = await Product.find(query).select('-photo');
+        res.json(products);
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Error to get products')
+    }
+
+})
 // @route   Get api/product/:productId
 // @desc    Get a list related to  product 
 // @access  Public
